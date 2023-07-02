@@ -1,0 +1,12 @@
+matplotlib
+librosa
+pyaudio
+pydub
+opencv-python
+PyOpenGL
+PyOpenGL-accelerate
+pyglut
+pyglet
+pygame
+sounddevice
+pyrr
