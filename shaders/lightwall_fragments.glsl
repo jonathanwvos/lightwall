@@ -66,15 +66,12 @@ vec3 squareSubwoofer(vec2 uv, float gaussCoeff, float sinMod) {
     return col;
 }
 
-vec3 manhattanSubwoofer(vec2 uv, float radius, float sinMod) {
-    // float subwooferRadius = 1.1;
-    float subMask = 0.0;
+vec3 manhattanSubwoofer(vec2 uv, float radius, float sinMod, float ampMod) {
     float d = 0.0;
-
-    subMask = manhattanDistance(uv);
-    d = manhattanDistance(uv);
+    float subMask = ampMod*manhattanDistance(uv);
     
-    subMask = 0.8/subMask;
+    d = ampMod*manhattanDistance(uv);
+    subMask = 0.8/subMask-0.1;
     subMask = step(radius, subMask);
     
     vec3 col = subwooferPalette(d);
@@ -102,36 +99,22 @@ vec3 manhattanGaussPulse(vec2 uv, float gaussCoeff, float sinMod, float timeCoef
 }
 
 void main() {
-    vec2 uv = interpolatedPosition.xy;
-    uv.x *= resolution.x/resolution.y;
+    vec2 uvOrigin = interpolatedPosition.xy*resolution.x/resolution.y;
+    vec2 uvL1 = interpolatedPosition.xy + vec2(0.5, 0.0);
+    vec2 uvL2 = interpolatedPosition.xy + vec2(0.95, 0.0);
+    vec2 uvR1 = interpolatedPosition.xy - vec2(0.5, 0.0);
+    vec2 uvR2 = interpolatedPosition.xy - vec2(0.95, 0.0);
 
     float gaussCoeff = 1.8;
     float sinMod = 10.0;
     float timeCoeff = 2.0;
-    vec3 mgp = manhattanGaussPulse(uv, gaussCoeff, sinMod, timeCoeff);
-    vec3 sub = manhattanSubwoofer(uv, 1.0, sinMod);
-    vec3 col = sub + mgp;
+    vec3 mgp = manhattanGaussPulse(uvOrigin, gaussCoeff, sinMod, timeCoeff);
+    vec3 subOrigin = manhattanSubwoofer(uvOrigin, 1.1, sinMod, 1.0);
+    vec3 subL1 = manhattanSubwoofer(uvL1, 1.1, sinMod, 1.7);
+    vec3 subL2 = manhattanSubwoofer(uvL2, 1.1, sinMod, 2.5);
+    vec3 subR1 = manhattanSubwoofer(uvR1, 1.1, sinMod, 1.7);
+    vec3 subR2 = manhattanSubwoofer(uvR2, 1.1, sinMod, 2.5);
 
+    vec3 col = mgp + subOrigin + subL1 + subL2 + subR1 + subR2;
     fragColor = vec4(col, 1.0);
 }
-
-// void main() {
-//     vec2 uvOrigin = interpolatedPosition.xy*resolution.x/resolution.y;
-//     vec2 uvL1 = interpolatedPosition.xy + vec2(0.5, 0.0);
-//     vec2 uvL2 = interpolatedPosition.xy + vec2(1.0, 0.0);
-//     vec2 uvR1 = interpolatedPosition.xy - vec2(0.5, 0.0);
-//     vec2 uvR2 = interpolatedPosition.xy - vec2(1.0, 0.0);
-
-//     float gaussCoeff = 1.8;
-//     float sinMod = 10.0;
-//     float timeCoeff = 2.0;
-//     vec3 mgp = manhattanGaussPulse(uvOrigin, gaussCoeff, sinMod, timeCoeff);
-//     vec3 subOrigin = manhattanSubwoofer(uvOrigin, 1.1, sinMod);
-//     vec3 subL1 = manhattanSubwoofer(uvL1, 1.0, sinMod);
-//     vec3 subL2 = manhattanSubwoofer(uvL2, 1.0, sinMod);
-//     vec3 subR1 = manhattanSubwoofer(uvR1, 1.0, sinMod);
-//     vec3 subR2 = manhattanSubwoofer(uvR2, 1.0, sinMod);
-    
-//     vec3 col = mgp + subOrigin + subL1 + subL2 + subR1 + subR2;
-//     fragColor = vec4(col, 1.0);
-// }

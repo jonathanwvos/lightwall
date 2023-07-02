@@ -224,7 +224,7 @@ class Lightwall:
 
 if __name__ == '__main__':
     no_chunks=1024
-    filename=join('music', 'Sound Chimera.wav')
+    filename=join('music', 'striker.wav')
     width=1920
     height=1080
 
