@@ -3,28 +3,11 @@ from OpenGL.GL import *
 from OpenGL.GL.shaders import compileProgram, compileShader
 from OpenGL.GLUT import *
 from time import time
+from utils import Shaders
 
 import numpy as np
 import pygame as pg
 import pyrr
-
-
-class Shaders:
-    def __init__(self, vertex_path, fragment_path):
-        self.vertex_path = vertex_path
-        self.fragment_path = fragment_path
-
-        with open(self.vertex_path, 'r') as f:
-            self.vertex_str = f.read()
-
-        with open(self.fragment_path, 'r') as f:
-            self.fragment_str = f.read()
-
-    def compile(self):
-        return compileProgram(
-            compileShader(self.vertex_str, GL_VERTEX_SHADER),
-            compileShader(self.fragment_str, GL_FRAGMENT_SHADER)
-        )
 
 
 class DrawRotatingTriangle:

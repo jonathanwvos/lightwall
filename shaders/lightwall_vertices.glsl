@@ -1,10 +1,9 @@
-#version 330 core
+#version 460 core
 
 layout (location=0) in vec3 fragCoord;
 
 out vec4 interpolatedPosition;
 
-uniform float angle;
 uniform mat4 projection;
 uniform mat4 model;
 

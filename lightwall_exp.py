@@ -43,7 +43,7 @@ class Canvas:
             join('shaders', 'lightwall_vertices.glsl'),
             join('shaders', 'lightwall_fragments.glsl')
         )
-        self.shaders = shaders.compile()
+        self.background_shaders = shaders.compile()
         self.init_GL()
 
     def init_GL(self):
@@ -54,20 +54,20 @@ class Canvas:
 
         self.vbo = glGenBuffers(1)
         glBindBuffer(GL_ARRAY_BUFFER, self.vbo)
-        glBufferData(GL_ARRAY_BUFFER, self.vertices.nbytes, self.vertices, GL_DYNAMIC_DRAW)
+        glBufferData(GL_ARRAY_BUFFER, self.vertices.nbytes, self.vertices, GL_STATIC_DRAW)
 
         glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, offset, ctypes.c_void_p(0))
         glEnableVertexAttribArray(0)
 
-        glUseProgram(self.shaders)
-        self.timeGL = glGetUniformLocation(self.shaders, 'time')
-        self.resGL = glGetUniformLocation(self.shaders, 'resolution')
-        self.projectionGL = glGetUniformLocation(self.shaders, 'projection')
-        self.bassDampGL = glGetUniformLocation(self.shaders, 'bassDampened')
-        self.midDampGL = glGetUniformLocation(self.shaders, 'midDampened')
-        self.umidDampGL = glGetUniformLocation(self.shaders, 'umidDampened')
-        self.trebDampGL = glGetUniformLocation(self.shaders, 'trebDampened')
-        self.modelGL = glGetUniformLocation(self.shaders,'model')
+        glUseProgram(self.background_shaders)
+        self.timeGL = glGetUniformLocation(self.background_shaders, 'time')
+        self.resGL = glGetUniformLocation(self.background_shaders, 'resolution')
+        self.projectionGL = glGetUniformLocation(self.background_shaders, 'projection')
+        self.bassDampGL = glGetUniformLocation(self.background_shaders, 'bassDampened')
+        self.midDampGL = glGetUniformLocation(self.background_shaders, 'midDampened')
+        self.umidDampGL = glGetUniformLocation(self.background_shaders, 'umidDampened')
+        self.trebDampGL = glGetUniformLocation(self.background_shaders, 'trebDampened')
+        self.modelGL = glGetUniformLocation(self.background_shaders,'model')
         model_transform = pyrr.matrix44.create_from_translation(vec=np.array([0, 0, -3]), dtype=np.float32)        
 
         projection_matrix = pyrr.matrix44.create_perspective_projection(
@@ -83,7 +83,7 @@ class Canvas:
         glUniformMatrix4fv(self.modelGL, 1, GL_FALSE, model_transform)
 
     def render(self, current_time, bass, mid, umid, treb):
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
+        glClear(GL_COLOR_BUFFER_BIT)
 
         glUniform1f(self.timeGL, current_time)
         glUniform1f(self.bassDampGL, bass)
@@ -95,7 +95,7 @@ class Canvas:
 
         pg.display.flip()
 
-        self.clock.tick(240)
+        self.clock.tick(60)
 
     def destroy(self):
         glDeleteVertexArrays(1, [self.vao])
