@@ -12,11 +12,11 @@ import numpy as np
 import pygame as pg
 import pyrr
 
-
 class Canvas:
-    def __init__(self, res_w, res_h):
+    def __init__(self, res_w, res_h, frame_rate):
         self.res_w = float(res_w)
         self.res_h = float(res_h)
+        self.frame_rate = frame_rate
         
         self.vertices = np.array([
             [-1.7, 1, 0],
@@ -95,7 +95,7 @@ class Canvas:
 
         pg.display.flip()
 
-        self.clock.tick(240)
+        self.clock.tick(self.frame_rate)
 
     def destroy(self):
         glDeleteVertexArrays(1, [self.vao])
@@ -183,7 +183,8 @@ class Lightwall:
         self.filename = filename
         self.res_w = width
         self.res_h = height
-        self.canvas = Canvas(self.res_w, self.res_w)
+        self.frame_rate = 240
+        self.canvas = Canvas(self.res_w, self.res_w, self.frame_rate)
         self.dj = DJ(self.no_bins)
     
     def event_handler(self):
@@ -216,6 +217,7 @@ class Lightwall:
                     umid_dampened,
                     treb_dampened
                 )
+                
                 execution_cycle += 1
 
             self.canvas.destroy()
@@ -223,7 +225,7 @@ class Lightwall:
 
 if __name__ == '__main__':
     no_chunks=1024
-    filename=join('music', 'Strength to Believe.wav')
+    filename=join('music', 'striker.wav')
     width=1920
     height=1080
 
