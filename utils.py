@@ -1,7 +1,11 @@
+from collections import deque
+from numpy import abs, frombuffer
+from numpy.fft import fft as FFT
 from OpenGL.GL import *
 from OpenGL.GL.shaders import compileProgram, compileShader, glDeleteShader
 from wave import open as open_wave
 
+import numpy as np
 import pyaudio
 
 
@@ -51,4 +55,71 @@ class Shaders:
             compileShader(self.fragment_str, GL_FRAGMENT_SHADER)
         )
     
-    # TODO: Delete Shaders 
+    # TODO: Delete Shaders
+
+
+class DJ:
+    def __init__(self):
+        self.no_bins = 15000
+        self.bass_inc = 188
+        self.mid_inc = 143
+        self.umid_inc = 1313
+        self.treb_inc = 12000
+
+        self.interval_0 = self.bass_inc
+        self.interval_1 = self.bass_inc+self.mid_inc
+        self.interval_2 = self.bass_inc+self.mid_inc+self.umid_inc
+        self.interval_3 = self.bass_inc+self.mid_inc+self.umid_inc+self.treb_inc
+
+        self.bass_queue = deque()
+        self.bass_queue_size = 10
+        self.bass_dampener = 0.9
+
+        self.mid_queue = deque()
+        self.mid_queue_size = 10
+        self.mid_dampener = 0.9
+
+        self.umid_queue = deque()
+        self.umid_queue_size = 10
+        self.umid_dampener = 0.9
+
+        self.treb_queue = deque()
+        self.treb_queue_size = 10
+        self.treb_dampener = 0.9
+
+    def audio_bands(self, data):
+        signal = frombuffer(data, dtype=np.int16)
+        fft = abs(FFT(signal, n=self.no_bins))
+        log_fft = np.emath.logn(2, fft)
+
+        return (
+            log_fft[:self.bass_inc],
+            log_fft[self.interval_0:self.interval_1],
+            log_fft[self.interval_1:self.interval_2],
+            log_fft[self.interval_2:self.interval_3]
+        )
+
+    def execute(self, data, execution_cycle):
+        bass, mid, umid, treb = self.audio_bands(data)
+
+        bass_mean = np.mean(bass)
+        self.bass_queue.append(bass_mean)
+        mid_mean = np.mean(mid)
+        self.mid_queue.append(mid_mean)
+        umid_mean = np.mean(umid)
+        self.umid_queue.append(umid_mean)
+        treb_mean = np.mean(treb)
+        self.treb_queue.append(treb_mean)
+
+        if execution_cycle >= self.bass_queue_size:
+            self.bass_queue.popleft()
+            self.mid_queue.popleft()
+            self.umid_queue.popleft()
+            self.treb_queue.popleft()
+
+        bass_dampened = self.bass_dampener*(np.mean(self.bass_queue))
+        mid_dampened = self.treb_dampener*(np.mean(self.mid_queue))
+        umid_dampened = self.treb_dampener*(np.mean(self.umid_queue))
+        treb_dampened = self.treb_dampener*(np.mean(self.treb_queue))
+
+        return bass_dampened, mid_dampened, umid_dampened, treb_dampened

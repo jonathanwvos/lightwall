@@ -231,23 +231,5 @@ void main() {
                subC1 + subC2 + subC3 + subC4 + subC5 + subC6 + subC7 + subC8 + subC9 + subC10 + subC11 + subC12 + subC13 + subC14 +
                subB1 + subB2 + subB3 + subB4 + subB5 + subB6 + subB7 + subB8 + subB9 + subB10 + subB11;
 
-    // float radius = 2.0;
-    // float trebAbs = 0.1*abs(trebDampened);
-    // const int trailSize = 100;
-    // float trailDist = 0.1;
-
-    // for (float i = 0.0; i < trailSize; i++) {
-    //     vec2 lemLeft = lemniscateOfBernoulliLeft(interpolatedPosition.xy, radius, -trebAbs-i*0.01);
-    //     vec2 lemRight = lemniscateOfBernoulliRight(interpolatedPosition.xy, radius, trebAbs+i*0.01);
-    //     col += manhattanSubwoofer(lemLeft, 5.0/(i*0.1), sinMod, 10.0, midDampened);
-    //     col += manhattanSubwoofer(lemRight, 5.0/(i*0.1), sinMod, 10.0, midDampened);
-    // }
-    // vec2 lem = lemniscateOfBernoulliRight(interpolatedPosition.xy, radius, trebAbs);
-    // vec2 lem2 = lemniscateOfBernoulliLeft(interpolatedPosition.xy, radius, -trebAbs);
-
-    // vec3 lemSub = circleSubwoofer(lem, 5.0, sinMod, 5.0, midDampened);
-    // vec3 lemSub2 = circleSubwoofer(lem2, 5.0, sinMod, 5.0, midDampened);
-
-    // vec3 col = mgp + subOrigin + subL1 + subL2 + subR1 + subR2 + lemSub + lemSub2;
     fragColor = vec4(col, 1.0);
 }

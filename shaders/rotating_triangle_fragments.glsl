@@ -45,9 +45,6 @@ void main()
 
         d = gaussianAct(d);
         d = sin(d*sinMod+time)/sinMod;
-        //float d = squareMetric(uv);
-        //d = step(0.01, d);
-        //d = smoothstep(0.0, 1.0, d);
         d = 0.015/d;
 
         finalColor += col * d;
