@@ -19,6 +19,10 @@ float manhattanDist(in vec2 C) {
     return abs(C.x) + abs(C.y);
 }
 
+float manhattanDist(in vec3 C) {
+    return abs(C.x) + abs(C.y) + abs(C.z);
+}
+
 float squareDist(in vec2 C) {
     return max(abs(C.x), abs(C.y));
 }
@@ -102,22 +106,47 @@ vec2 lissajous(float d) {
     return vec2(x, y);
 }
 
+float gaussian(in float x, in float p) {
+    return exp(-pow(x,p));
+}
 
-// vec3 palette(float t) {
-//     vec3 a = vec3(0.5,0.5,0.5);
-//     vec3 b = vec3(0.5,0.5,0.5);
-//     vec3 c = vec3(1.0,1.0,1.0);
-//     vec3 d = vec3(0.263,0.416,0.557);
+vec3 palette(float t) {
+    vec3 a = vec3(0.5,0.5,0.5);
+    vec3 b = vec3(0.5,0.5,0.5);
+    vec3 c = vec3(1.0,1.0,1.0);
+    vec3 d = vec3(0.263,0.416,0.557);
     
-//     return a + b*cos(6.28318*(c*t+d));
-// }
+    return a + b*cos(6.28318*(c*t+d));
+}
+
+vec3 manhattanGaussPulse(vec3 uv, float gaussCoeff, float sinMod, float timeCoeff) {
+    float d = 5*gaussian(manhattanDist(uv), gaussCoeff);
+    vec3 col = purple_gradient(d);
+
+    // vec3 col = palette(d);
+    d = sin(d*sinMod+timeCoeff*time)/sinMod;
+    d = abs(d);
+    d = 0.02/d;
+    
+    col *= d;
+
+    return col;
+}
 
 void main()
 {
-    vec2 uv = interpolatedPosition.xy;
+    vec3 uv = interpolatedPosition.xyz;
     uv.x *= resolution.x/resolution.y;
-    float d = length(uv);
-    d = cochleoid(d);
-    vec3 col = purple_gradient(d);
-    fragColor = vec4(col, 1.0);
+    vec3 mgp = manhattanGaussPulse(uv, 2.0, 8.0, 5.0);
+
+    // float d = length(uv)/1000;
+    // d = cochleoid(d);
+    // vec3 col = purple_gradient(d);
+    fragColor = vec4(mgp, 1.0);
+    // vec2 uv = interpolatedPosition.xy;
+    // uv.x *= resolution.x/resolution.y;
+    // float d = length(uv);
+    // d = cochleoid(d);
+    // vec3 col = purple_gradient(d);
+    // fragColor = vec4(col, 1.0);
 }

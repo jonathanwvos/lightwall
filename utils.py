@@ -1,5 +1,6 @@
 from collections import deque
-from numpy import abs, frombuffer
+from numpy import abs, array, frombuffer, power, sqrt, mean
+from numpy import int16 as INT16
 from numpy.fft import fft as FFT
 from OpenGL.GL import *
 from OpenGL.GL.shaders import compileProgram, compileShader, glDeleteShader
@@ -88,7 +89,7 @@ class DJ:
         self.treb_dampener = 0.9
 
     def audio_bands(self, data):
-        signal = frombuffer(data, dtype=np.int16)
+        signal = frombuffer(data, dtype=INT16)
         fft = abs(FFT(signal, n=self.no_bins))
         log_fft = np.emath.logn(2, fft)
 
@@ -102,13 +103,13 @@ class DJ:
     def execute(self, data, execution_cycle):
         bass, mid, umid, treb = self.audio_bands(data)
 
-        bass_mean = np.mean(bass)
+        bass_mean = mean(bass)
         self.bass_queue.append(bass_mean)
-        mid_mean = np.mean(mid)
+        mid_mean = mean(mid)
         self.mid_queue.append(mid_mean)
-        umid_mean = np.mean(umid)
+        umid_mean = mean(umid)
         self.umid_queue.append(umid_mean)
-        treb_mean = np.mean(treb)
+        treb_mean = mean(treb)
         self.treb_queue.append(treb_mean)
 
         if execution_cycle >= self.bass_queue_size:
@@ -117,9 +118,15 @@ class DJ:
             self.umid_queue.popleft()
             self.treb_queue.popleft()
 
-        bass_dampened = self.bass_dampener*(np.mean(self.bass_queue))
-        mid_dampened = self.treb_dampener*(np.mean(self.mid_queue))
-        umid_dampened = self.treb_dampener*(np.mean(self.umid_queue))
-        treb_dampened = self.treb_dampener*(np.mean(self.treb_queue))
+        bass_dampened = self.bass_dampener*(mean(self.bass_queue))
+        mid_dampened = self.treb_dampener*(mean(self.mid_queue))
+        umid_dampened = self.treb_dampener*(mean(self.umid_queue))
+        treb_dampened = self.treb_dampener*(mean(self.treb_queue))
 
         return bass_dampened, mid_dampened, umid_dampened, treb_dampened
+    
+def euclidean_distance(v1, v2):
+    v1 = array(v1)
+    v2 = array(v2)
+    
+    return sqrt(sum(power(v1-v2, 2.0)))
