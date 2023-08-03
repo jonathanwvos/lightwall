@@ -19,8 +19,9 @@ float manhattanDist(in vec2 C) {
     return abs(C.x) + abs(C.y);
 }
 
-float manhattanDist(in vec3 C) {
-    return abs(C.x) + abs(C.y) + abs(C.z);
+float manhattanDistXY(in vec3 C) {
+    return abs(C.x) + abs(C.y);
+    // return abs(C.x) + abs(C.y) + abs(C.z);
 }
 
 float squareDist(in vec2 C) {
@@ -120,10 +121,9 @@ vec3 palette(float t) {
 }
 
 vec3 manhattanGaussPulse(vec3 uv, float gaussCoeff, float sinMod, float timeCoeff) {
-    float d = 5*gaussian(manhattanDist(uv), gaussCoeff);
+    float d = 5*gaussian(manhattanDistXY(uv), gaussCoeff);
     vec3 col = purple_gradient(d);
 
-    // vec3 col = palette(d);
     d = sin(d*sinMod+timeCoeff*time)/sinMod;
     d = abs(d);
     d = 0.02/d;

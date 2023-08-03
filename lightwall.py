@@ -136,7 +136,7 @@ class Lightwall:
                 run = self.event_handler()
 
                 stream.write(data) # Stream audio to speakers
-                bass_dampened, mid_dampened, umid_dampened, treb_dampened = self.dj.execute(data, execution_cycle)
+                bass_dampened, mid_dampened, umid_dampened, treb_dampened = self.dj.extract_bands(data, execution_cycle)
                 current_time = time() - start_time
 
                 self.canvas.render(

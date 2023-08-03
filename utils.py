@@ -1,7 +1,9 @@
 from collections import deque
 from numpy import abs, array, frombuffer, power, sqrt, mean
 from numpy import int16 as INT16
+from numpy import var as variance
 from numpy.fft import fft as FFT
+from numpy.fft import ifft as IFFT
 from OpenGL.GL import *
 from OpenGL.GL.shaders import compileProgram, compileShader, glDeleteShader
 from wave import open as open_wave
@@ -87,20 +89,50 @@ class DJ:
         self.treb_queue = deque()
         self.treb_queue_size = 10
         self.treb_dampener = 0.9
+        
+        self.beat_queue = deque()
+        self.beat_queue_size = 10
+        self.beat_dampener = 0.9
 
-    def audio_bands(self, data):
+    def audio_bands(self, data, log=True):
         signal = frombuffer(data, dtype=INT16)
         fft = abs(FFT(signal, n=self.no_bins))
-        log_fft = np.emath.logn(2, fft)
+        if log:
+            fft = np.emath.logn(2, fft)
 
         return (
-            log_fft[:self.bass_inc],
-            log_fft[self.interval_0:self.interval_1],
-            log_fft[self.interval_1:self.interval_2],
-            log_fft[self.interval_2:self.interval_3]
+            fft[:self.bass_inc],
+            fft[self.interval_0:self.interval_1],
+            fft[self.interval_1:self.interval_2],
+            fft[self.interval_2:self.interval_3]
         )
+        
+    def autocorrelation_function(self, data):
+        signal = frombuffer(data, dtype=INT16)
+        var = variance(signal)
+        fft = abs(FFT(signal, n=self.no_bins))
+        pwr = fft**2
+        ifft = IFFT(pwr).real/var/self.no_bins
+        
+        return ifft
+    
+    # def extract_beat(self, data, execution_cycle):
+    #     acf = self.autocorrelation_function(data)
+    #     acf = np.round(acf, 2)
+    #     max_value = max(acf)
+    #     print(max_value)
+    #     max_value_idx = np.where(acf == max_value)[0]
+    #     beat = (max_value_idx[0]-max_value_idx[-1])/len(acf)
+        
+    #     self.beat_queue.append(max_value)
+    #     if execution_cycle >= self.beat_queue_size:
+    #         self.beat_queue.popleft()
+            
+    #     beat_dampened = mean(self.beat_queue)
+        
+    #     return beat_dampened
 
-    def execute(self, data, execution_cycle):
+    def extract_bands(self, data, execution_cycle):
         bass, mid, umid, treb = self.audio_bands(data)
 
         bass_mean = mean(bass)

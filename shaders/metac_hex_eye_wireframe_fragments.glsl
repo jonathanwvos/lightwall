@@ -9,5 +9,5 @@ uniform vec2 resolution;
 
 void main()
 {
-    fragColor = vec4(0.141, 0, 0.337, 1.0);
+    fragColor = vec4(0.812, 0.667, 1.0, 1.0);
 }

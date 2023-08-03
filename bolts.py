@@ -8,9 +8,12 @@ from random import uniform, choice
 import cv2
 
 
-def _bolt(no_edges, edge_len, origin, branch_angle, z):
+def _bolt(no_edges, edge_len, origin, branch_angle, z, grid=True):
     bolt = [origin]
-    angle = uniform(0, 2*PI)
+    if grid:
+        angle = choice([0, PI/3, PI*2/3, PI, PI*4/3, PI*5/3])
+    else:
+        angle = uniform(0, 2*PI)
     p1 = [edge_len*cos(angle), edge_len*sin(angle), z]
     bolt.append(p1+origin)
     
