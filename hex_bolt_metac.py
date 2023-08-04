@@ -146,6 +146,12 @@ class Canvas:
             join('shaders', 'metac_hex_eye_wireframe_fragments.glsl')
         )
         self.hex_eye_wireframe_shaders = hex_eye_wireframe_shaders.compile()
+        
+        hex_grid_shaders = Shaders(
+            join('shaders', 'hex_grid_vertices.glsl'),
+            join('shaders', 'hex_grid_fragments.glsl')
+        )
+        self.hex_grid_shaders = hex_grid_shaders.compile()
     
     def set_projection_matrices(self, shaders):
         projectionGL = glGetUniformLocation(shaders, 'projection')
@@ -168,6 +174,12 @@ class Canvas:
         self.set_projection_matrices(self.bolt_shaders)
         self.bolt_vao = glGenVertexArrays(2)
         self.bolt_vbo = glGenBuffers(2)
+        
+    def set_grid_GL(self):
+        glUseProgram(self.hex_grid_shaders)
+        self.set_projection_matrices(self.hex_grid_shaders)
+        self.bolt_vao = glGenVertexArrays(1)
+        self.bolt_vbo = glGenBuffers(1)
 
     def set_eye_GL(self):
         glUseProgram(self.hex_eye_shaders)
@@ -233,6 +245,9 @@ class Canvas:
         glEnable(GL_LINE_SMOOTH)
         glEnable(GL_BLEND)
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
+
+    # def render_hex_grid(self, points, point_width):
+        
 
     def render_bolt_points(self, points, point_width):
         self.configure_bolt_arrays_and_buffers(
